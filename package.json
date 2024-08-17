@@ -1,13 +1,13 @@
 {
-  "name": "compiler",
+  "name": "IDE",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "author": "",
+  "author": "divya",
   "license": "ISC",
-  "description": "",
+  "description": "an IDE",
   "dependencies": {
     "body-parser": "^1.19.0",
     "compilex": "^0.7.4",
