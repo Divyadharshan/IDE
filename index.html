@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,15 +29,18 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
         }
         textarea {
             width: 100%;
-            max-width: 400px;
             font-family: sans-serif;
             border: 1px solid #ccc;
             border-radius: 5px;
             margin-bottom: 10px;
             font-size: 15px;
+            box-sizing: border-box;
         }
         select, input[type="radio"], input[type="submit"] {
             margin-top: 10px;
@@ -54,6 +58,44 @@
         }
         input[type="submit"]:hover {
             background: #0056b3;
+        }
+        #editor {
+            height: 300px;
+            width: 100%;
+            font-size: 18px;
+        }
+        .opts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .inp, .out {
+            width: 100%;
+            margin-top: 20px;
+        }
+        .inp h3, .out h3 {
+            margin-bottom: 10px;
+        }
+        @media (min-width: 768px) {
+            #editor {
+                height: 500px;
+            }
+            .opts {
+                flex-direction: row;
+                justify-content: space-evenly;
+            }
+            .editor-container {
+                display: flex;
+                flex-direction: row;
+                gap: 30px;
+            }
+            .inp, .out {
+                margin-top: 0;
+            }
+            .inp, .out textarea {
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -76,7 +118,7 @@
             </select>
         </div>
         <h2 style="color:#000000;font-weight:800;">Code</h2>
-        <div class="opts" style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        <div class="opts">
             <div class="dropdown_container">
                 <label for="lang">Choose a language:</label>
                 <select id="lang" name="lang">
@@ -87,13 +129,14 @@
             </div>
         </div>
         <hr>
-        <div style="display: flex; flex-direction: row;">
-            <div id="editor" style="height: 530px; width: 500px; font-size: 18px;" name="code"></div>
-            <div style="display: flex; flex-direction: column; padding-left: 30px;">
+        <div class="editor-container">
+            <div id="editor" name="code"></div>
+            <div class="input-output-container">
                 <div class="inp">
                     <h3>Input:</h3>
                     <textarea rows="11" cols="100" id="input" name="input"></textarea>
                 </div>
+                <br>
                 <div class="out">
                     <h3>Output:</h3>
                     <textarea name="output" id="output" rows="11" cols="100"></textarea>
