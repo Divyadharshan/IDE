@@ -1,0 +1,366 @@
+<!--<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.min.css">
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/64/17359/17359096.png" type="image/x-icon">
+    <title>Online IDE</title>
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: grey;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+        h2{
+            text-align: center;
+        }
+        form {
+            display: inline-block;
+            text-align: left;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            max-width:400px;
+            font-family: sans-serif;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size:15px;
+        }
+        select, input[type="radio"], input[type="submit"] {
+            margin-top: 10px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color:#000000;font-weight:800;">Online IDE</h1>
+    <form id="myform" name="myform" method="post" action="/compilecode" style="background-color: #f9fcff;
+background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);">
+        <div align="right" class="dropdown_container">
+            <label for="theme_select">Choose a theme:</label>
+            <select id="theme_select" name="theme_select">
+                <option value="monokai">Monokai</option>
+                <option value="github">GitHub</option>
+                <option value="github_dark">Github Dark</option>
+                <option value="twilight" selected>Twilight</option>
+                <option value="xcode">Xcode</option>
+                <option value="solarized_light">Solarized Light</option>
+                <option value="solarized_dark">Solarized Dark</option>
+                <option value="ambiance">Ambiance</option>
+                <option value="merbivore">Merbivore</option>
+                <option value="terminal">Terminal</option>
+            </select>
+    </div>
+        <h2 style="color:#000000;font-weight:800;">Code</h2>
+        <div class="opts" style="display: flex;flex-direction: row;justify-content:space-evenly;">
+        <div class="dropdown_container">
+            <label for="lang">Choose a language:</label>
+            <select id="lang" name="lang">
+                <option value="Python">Python</option>
+                <option value="C">C</option>
+                <option value="C++">C++</option>
+            </select>
+            </div>
+            </div>
+            <hr>
+        <div style="display:flex;flex-direction:row;">
+ <div id="editor" style="height:530px;width:500px;font-size:18px;" name="code"></div>  
+        <div style="display:flex;flex-direction:column;padding-left:30px;">
+            <div class="inp">
+             <h3>Input : </h3>
+             <textarea rows="11" cols="100" id="input" name="input"></textarea>
+            </div>
+            <div class="out">
+             <h3>Output : </h3>
+                <textarea name="output" id="output" rows="11" cols="100">
+                </textarea>
+            </div>
+        </div>
+        </div>
+        <center>
+        <div>
+        <br>
+            <label>Compile with Input : </label>
+            <label>
+                <input type="radio" name="inputRadio" id="inputRadioYes" value="true"> Yes
+            </label>
+            <label>
+                <input type="radio" name="inputRadio" id="inputRadioNo" value="false" checked> No
+            </label>
+        </div>
+        <input type="submit" value="Run" name="submit">
+        <hr>
+        </center>
+    </form>
+       <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script> 
+           <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"></script>
+
+       
+    <script>
+        let editor = ace.edit("editor");
+        editor.setTheme("ace/theme/twilight");
+        editor.session.setMode("ace/mode/python");
+        editor.setValue('#Your Python code here')
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            autoScrollEditorIntoView: true,
+        });
+         const templates = {
+            'c++': '#include <iostream>\n\nint main() {\n    //write your C++ code here\n    return 0;\n}',
+            'c':'#include <stdio.h>\n\nint main() {\n    //write your C code here\n    return 0;\n}',
+            'python': '#write your Python code here',
+        };
+
+        const form=document.querySelector("#myform");
+        const changeLang=document.querySelector("#lang");
+        const themeSelect=document.querySelector('#theme_select');
+        changeLang.addEventListener('change',function(){
+            const langOpt=this.value.toLowerCase();
+            if(langOpt==='C' || langOpt=='C++'){
+                editor.session.setMode(`ace/mode/c_cpp`)
+                if(langOpt==='C')
+                    editor.setValue(templates[langOpt])
+                else
+                    editor.setValue(templates[langOpt])
+            }
+            else{
+                editor.session.setMode(`ace/mode/${langOpt}`);
+                editor.setValue(templates[langOpt])
+            }
+        });
+        themeSelect.addEventListener('change',function(){
+            editor.setTheme(`ace/theme/${this.value}`)
+        })
+        form.addEventListener('submit',async(e)=>{
+            e.preventDefault();
+            const code =editor.getValue()
+            const input = form.input.value;
+            const inputRadio = form.inputRadio.value;
+            const lang = form.lang.value;
+            const d={code:code,input:input,inputRadio:inputRadio,lang:lang};
+            let opt;
+            const func=async ()=>{
+            form.output.value='Compiling ⚙️'
+            let res=await fetch("http://localhost:3815/compilecode",{
+                method:"post",
+                body:JSON.stringify(d),
+                headers:{
+                    "Content-Type":"application/json"
+                }
+            })
+            res=await res.json();
+            console.log(form.output.value,res.output,'fdf')
+            form.output.value=res.output;
+            opt=res.output;
+            return res.output;
+            }
+            await func();
+        })
+    </script>
+
+
+</body>
+</html>-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/theme-monokai.min.css">
+    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/64/17359/17359096.png" type="image/x-icon">
+    <title>Online IDE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: grey;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+            margin-top: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+        form {
+            display: inline-block;
+            text-align: left;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            max-width: 400px;
+            font-family: sans-serif;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+        select, input[type="radio"], input[type="submit"] {
+            margin-top: 10px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="color:#000000;font-weight:800;">Online IDE</h1>
+    <form id="myform" name="myform" method="post" action="/compilecode" style="background-color: #f9fcff; background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);">
+        <div align="right" class="dropdown_container">
+            <label for="theme_select">Choose a theme:</label>
+            <select id="theme_select" name="theme_select">
+                <option value="monokai">Monokai</option>
+                <option value="github">GitHub</option>
+                <option value="github_dark">Github Dark</option>
+                <option value="twilight" selected>Twilight</option>
+                <option value="xcode">Xcode</option>
+                <option value="solarized_light">Solarized Light</option>
+                <option value="solarized_dark">Solarized Dark</option>
+                <option value="ambiance">Ambiance</option>
+                <option value="merbivore">Merbivore</option>
+                <option value="terminal">Terminal</option>
+            </select>
+        </div>
+        <h2 style="color:#000000;font-weight:800;">Code</h2>
+        <div class="opts" style="display: flex; flex-direction: row; justify-content: space-evenly;">
+            <div class="dropdown_container">
+                <label for="lang">Choose a language:</label>
+                <select id="lang" name="lang">
+                    <option value="Python">Python</option>
+                    <option value="C">C</option>
+                    <option value="C++">C++</option>
+                </select>
+            </div>
+        </div>
+        <hr>
+        <div style="display: flex; flex-direction: row;">
+            <div id="editor" style="height: 530px; width: 500px; font-size: 18px;" name="code"></div>
+            <div style="display: flex; flex-direction: column; padding-left: 30px;">
+                <div class="inp">
+                    <h3>Input:</h3>
+                    <textarea rows="11" cols="100" id="input" name="input"></textarea>
+                </div>
+                <div class="out">
+                    <h3>Output:</h3>
+                    <textarea name="output" id="output" rows="11" cols="100"></textarea>
+                </div>
+            </div>
+        </div>
+        <center>
+            <div>
+                <br>
+                <label>Compile with Input:</label>
+                <label>
+                    <input type="radio" name="inputRadio" id="inputRadioYes" value="true"> Yes
+                </label>
+                <label>
+                    <input type="radio" name="inputRadio" id="inputRadioNo" value="false" checked> No
+                </label>
+            </div>
+            <input type="submit" value="Run" name="submit">
+            <hr>
+        </center>
+    </form>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.14/ext-language_tools.js"></script>
+    <script>
+        let editor = ace.edit("editor");
+        editor.setTheme("ace/theme/twilight");
+        editor.session.setMode("ace/mode/python");
+        editor.setValue('#Your Python code here');
+        editor.setOptions({
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            autoScrollEditorIntoView: true,
+        });
+
+        const templates = {
+            'c++': '#include <iostream>\n\nint main() {\n    //write your C++ code here\n    return 0;\n}',
+            'c': '#include <stdio.h>\n\nint main() {\n    //write your C code here\n    return 0;\n}',
+            'python': '#write your Python code here',
+        };
+
+        const form = document.querySelector("#myform");
+        const changeLang = document.querySelector("#lang");
+        const themeSelect = document.querySelector('#theme_select');
+
+        changeLang.addEventListener('change', function () {
+            const langOpt = this.value.toLowerCase();
+            if (langOpt === 'c' || langOpt === 'c++') {
+                editor.session.setMode(`ace/mode/c_cpp`);
+            } else {
+                editor.session.setMode(`ace/mode/${langOpt}`);
+            }
+            editor.setValue(templates[langOpt] || '');
+        });
+
+        themeSelect.addEventListener('change', function () {
+            editor.setTheme(`ace/theme/${this.value}`);
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = editor.getValue();
+            const input = form.input.value;
+            const inputRadio = form.inputRadio.value;
+            const lang = form.lang.value;
+            const data = { code: code, input: input, inputRadio: inputRadio, lang: lang };
+            form.output.value = 'Compiling ⚙️';
+            let res = await fetch("/compilecode", {
+                method: "post",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+            res = await res.json();
+            form.output.value = res.output;
+        });
+    </script>
+</body>
+</html>
