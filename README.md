@@ -7,6 +7,11 @@ Features
 * **Language Support**: Write and run code in C, C++, and Python.
 * **Responsive Design**: Accessible on various devices, including desktops, tablets, and smartphones.
 
+Screenshots
+-----------
+<div style="display:flex;"><img src="IDE-1.png" width="500" height="300">
+<img src="IDE-2.png" width="500" height="300"></div>
+
 Getting Started
 ---------------
 
