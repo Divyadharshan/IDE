@@ -1,149 +1,67 @@
-/*var express = require("express");
-var path = require("path");
-var compiler = require("compilex");
-
-var app = express();
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-var option = { stats: true };
-compiler.init(option);
-
-app.get("/", function(req, res) {
-    res.sendFile(path.join(__dirname, "index.html"));
-});
-
-app.post("/compilecode", function(req, res) {
-    console.log(req.body)
-    var code = req.body.code;
-    var input = req.body.input;
-    var inputRadio = req.body.inputRadio;
-    var lang = req.body.lang;
-
-    if (lang === "C" || lang === "C++") {
-        var envData = { OS: "windows", cmd: "g++", options: { timeout: 10000 } };
-        if (inputRadio === "true") {
-            compiler.compileCPPWithInput(envData, code, input, function(data) {
-                console.log("Compile result:", data);
-                if (data.error) {
-                    res.json({ output: data.error });
-                } else {
-                    res.json({ output: data.output });
-                }
-            });
-        } else {
-            compiler.compileCPP(envData, code, function(data) {
-                console.log("Compile result:", data);
-                if(data.error) {
-                    res.json({ output: data.error });
-                }
-                else {
-                    res.json({ output: data.output });
-                }
-            });
-        }
-    } else if (lang === "Python") {
-        var envData = { OS: "windows" };
-        if (inputRadio === "true") {
-            compiler.compilePythonWithInput(envData, code, input, function(data) {
-                console.log("Compile result:", data);
-                if(data.error) {
-                    res.json({ output: data.error });
-                }
-                else{
-                    res.json({ output: data.output });
-                }
-            });
-        } else {
-            compiler.compilePython(envData, code, function(data) {
-                console.log("Compile result:", data);
-                if(data.error) {
-                    res.json({ output: data.error });
-                }
-                else{
-                    res.json({ output: data.output });
-                }
-        });
-    }
+if (process.env.NODE_ENV !== "production") {
+    require("dotenv").config();
 }
-});
 
-app.get("/fullStat", function(req, res) {
-    compiler.fullStat(function(data) {
-        res.send(data);
-    });
-});
+const express = require("express");
+const axios = require("axios");
+const path = require("path");
+const bodyParser = require("body-parser");
+const app = express();
+app.use(bodyParser.json());
 
-app.listen(3815, function() {
-    console.log("Server is running on port 3815");
-});
+const JUDGE0_URL = process.env.BASEURL;
+const API_KEY = process.env.API;
 
-compiler.flush(function() {
-    console.log("All temporary files flushed!");
-});
-*/
-var express = require("express");
-var path = require("path");
-var compiler = require("compilex");
+const languageMap = {"C": 50,"C++": 54,"Python": 71,"Java": 62,"JavaScript": 63};
 
-var app = express();
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-var option = { stats: true };
-compiler.init(option);
-
-app.get("/", function(req, res) {
+app.get("/", function (req, res) {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
-app.post("/compilecode", function(req, res) {
-    console.log(req.body);
-    var code = req.body.code;
-    var input = req.body.input;
-    var inputRadio = req.body.inputRadio;
-    var lang = req.body.lang;
+app.post("/compilecode", async (req, res) => {
+    const { code, input, lang } = req.body;
+    if (!languageMap[lang]) {
+        console.error("Unsupported language received:", lang);
+        return res.status(400).json({ error: `Unsupported language: ${lang}` });
+    }
+    try {
+        //Submit Code for Execution
+        const response = await axios.post(`${JUDGE0_URL}?base64_encoded=false&wait=false`, {
+            source_code: code,
+            language_id: languageMap[lang],
+            stdin: input
+        }, {
+            headers: {
+                "X-RapidAPI-Key": API_KEY,
+                "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+                "Content-Type": "application/json"
+            }
+        });
+        if (!response.data.token) {
+            return res.status(500).json({ error: "Failed to submit code for execution" });
+        }
+        const token = response.data.token;
+        let outputResponse;
+        while (true) {
+            outputResponse = await axios.get(`${JUDGE0_URL}/${token}?base64_encoded=false`, {
+                headers: {
+                    "X-RapidAPI-Key": API_KEY,
+                    "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+                }
+            });
 
-    if (lang === "C" || lang === "C++") {
-        var envData = { OS: "windows", cmd: "g++", options: { timeout: 10000 } };
-        if (inputRadio === "true") {
-            compiler.compileCPPWithInput(envData, code, input, function(data) {
-                console.log("Compile result:", data);
-                res.json({ output: data.error || data.output });
-            });
-        } else {
-            compiler.compileCPP(envData, code, function(data) {
-                console.log("Compile result:", data);
-                res.json({ output: data.error || data.output });
-            });
+            if (outputResponse.data.status.id >= 3) break;
         }
-    } else if (lang === "Python") {
-        var envData = { OS: "windows" };
-        if (inputRadio === "true") {
-            compiler.compilePythonWithInput(envData, code, input, function(data) {
-                console.log("Compile result:", data);
-                res.json({ output: data.error || data.output });
-            });
-        } else {
-            compiler.compilePython(envData, code, function(data) {
-                console.log("Compile result:", data);
-                res.json({ output: data.error || data.output });
-            });
-        }
+        const result = outputResponse.data;
+        res.json({ output: result.stdout || result.stderr || "Execution error" });
+
+    } catch (error) {
+        console.error("Execution Error:", error.response ? error.response.data : error.message);
+        res.status(500).json({ error: "Execution failed" });
     }
 });
 
-app.get("/fullStat", function(req, res) {
-    compiler.fullStat(function(data) {
-        res.send(data);
-    });
-});
-
-const PORT = process.env.PORT || 3815;
-app.listen(PORT, function() {
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-});
-
-compiler.flush(function() {
-    console.log("All temporary files flushed!");
 });
