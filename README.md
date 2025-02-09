@@ -39,7 +39,7 @@ This will start the development server, and you can access the IDE by navigating
 
 Live Demo
 -----------------------
-  https://ide-wd8t.onrender.com/
+  https://ide-lake-two.vercel.app/
 
 Usage
 -----
