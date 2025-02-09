@@ -8,11 +8,6 @@ Features
 * **Responsive Design**: Accessible on various devices, including desktops, tablets, and smartphones.
 * **Cloud-Based Execution**: No need for local compilers; code execution is handled via APIs.
 
-Screenshots
------------
-<div style="display:flex;"><img src="IDE-1.png" width="500" height="300">
-<img src="IDE-2.png" width="500" height="300"></div>
-
 Getting Started
 ---------------
 
