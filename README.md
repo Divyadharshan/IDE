@@ -1,70 +1,95 @@
-<div align="center"><h1>Online IDE</h1></div>
-<div align="center">Welcome to the Online IDE, a web-based integrated development environment that allows you to write, compile, and execute code directly in your browser.</div>
+<div align="center">
 
-Features
---------
+# 💻 Online IDE
 
-* **Language Support**: Write and run code in C, C++, Python, Java, and JavaScript.
-* **Responsive Design**: Accessible on various devices, including desktops, tablets, and smartphones.
-* **Cloud-Based Execution**: No need for local compilers; code execution is handled via APIs.
+🚀 Welcome to **Online IDE**, a sleek and powerful web-based integrated development environment that lets you **write, compile, and execute code directly in your browser** - anytime, anywhere!
 
-Getting Started
----------------
+</div>
 
-### Prerequisites
+---
 
-To run the Online IDE locally or contribute to its development, you’ll need:
+## ✨ Features
 
-* **Node.js** : [Download and install Node.js](https://nodejs.org/)
-* **Git** : [Download and install Git](https://git-scm.com/)
+- 🧠 **Multi-language Support**: Run code in **C, C++, Python, Java, and JavaScript**.
+- 📱 **Responsive Design**: Use it seamlessly across **desktops, tablets, and smartphones**.
+- ☁️ **Cloud-Based Execution**: No local setup required — everything runs via secure APIs.
 
-Installation
-------------
+---
 
-Clone the repository and install dependencies :
+## ⚙️ Getting Started
 
-    git clone https://github.com/Divyadharshan/IDE.git
-    cd IDE
-    npm install
-        
+### 📋 Prerequisites
 
-Running the Application
------------------------
+Before running the Online IDE locally, make sure you have:
 
-To start the application locally :
+-  **Node.js** – [Download Node.js](https://nodejs.org/)
 
-    npm start
-    
-This will start the development server, and you can access the IDE by navigating to [http://localhost:3000](http://localhost:3000) in your web browser.
+---
 
-Live Demo
------------------------
-  https://ide-lake-two.vercel.app/
+## 📦 Installation
 
-Usage
------
+Clone the repository and install dependencies:
 
-### Writing and Running Code
+```bash
+git clone https://github.com/Divyadharshan/IDE.git
+cd IDE
+npm install
+```
 
-1.  Select the programming language from the dropdown.
-2.  Write your code in the editor.
-3.  Select compile with input "Yes/No"
-4.  Click the "Run" button to execute the code.
-5.  View the output
+---
 
-API Integration
----------------
+## 🛠️ Environment Setup
 
-The Online IDE uses a cloud-based API to compile and execute code, eliminating the need for local compilers. The API supports:
+Create a `.env` file in the root of the project and add the following variables:
 
-* **Code Execution**: Sends code, language selection, and optional input to the API for processing.
-* **Real-time Output**: Receives execution results and displays them instantly.
+```env
+BASEURL=https://judge0-ce.p.rapidapi.com/submissions
+API=YOUR_API_KEY
+```
 
-Contributing
-------------
+> 🔐 **Note**:  
+> `BASEURL` is the endpoint for Judge0 code submission.  
+> `API` is your **RapidAPI key** for authenticating requests. Keep it safe!
 
-I welcome contributions! Please follow these steps to contribute :
-1.  Fork the repository.
-2.  Create a new branch for your feature or bugfix.
-3.  Commit your changes and push them to your fork.
-4.  Submit a pull request to the main repository.
+---
+
+## 🏃 Running the Application
+
+To start the development server locally:
+
+```bash
+npm start
+```
+
+Then open your browser and visit:  
+👉 [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🌐 Live Demo
+ 
+🔗 [https://ide-lake-two.vercel.app/](https://ide-lake-two.vercel.app/)
+
+---
+
+## 🧑‍💻 Usage
+
+### ✍️ Writing and Running Code
+
+1. 🔽 **Choose** a programming language from the dropdown.
+2. 🧾 **Write** your code in the editor.
+3. 📥 **Select** if input is required (`Yes/No`).
+4. ▶️ **Click** the "Run" button.
+5. 📤 **View** the output in real-time below the editor.
+
+---
+
+## 🔌 API Integration (Judge0)
+
+This IDE uses the **Judge0 API** to compile and execute code in the cloud:
+
+- 🛰️ `POST` to **/submissions** with language, source code, and input.
+- 🔁 Poll the **token** to get results using `GET /submissions/{token}`.
+- 🛡️ Authenticated using your **RapidAPI key** in headers.
+
+---
